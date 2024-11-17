@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 const userSchema = mongoose.Schema({
     name: {
@@ -12,7 +13,8 @@ const userSchema = mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Please provide a password']
+        required: [true, 'Please provide a password'],
+        minLength: [6, 'Password must be at least 6 characters long']
     },
     savedJobs: [{
         jobId: String,
@@ -31,7 +33,7 @@ const userSchema = mongoose.Schema({
 });
 
 // Hash password before saving to DB
-userSchema.pre('save', async (next)=> {
+userSchema.pre('save', async function(next) {
     if(!this.isModified('password')){
         next();
     }
@@ -44,4 +46,4 @@ userSchema.methods.matchPassword = async function(enteredPassword){
     return await bcrypt.compare(enteredPassword, this.password);
 }
 
-module.exports = mongoose.model('User', userSchema)
+module.exports = mongoose.model('User', userSchema);
